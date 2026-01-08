@@ -1,6 +1,7 @@
 
 import React, { useRef, useMemo } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
+// Fix: Added ThreeElements to resolve JSX intrinsic element errors
+import { useFrame, useThree, ThreeElements } from '@react-three/fiber';
 import { Sky, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 

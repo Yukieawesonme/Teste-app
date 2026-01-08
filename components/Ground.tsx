@@ -1,7 +1,8 @@
 
 import React, { useRef, useMemo, useEffect } from 'react';
 import * as THREE from 'three';
-import { useFrame, useThree } from '@react-three/fiber';
+// Fix: Added ThreeElements to resolve JSX intrinsic element errors
+import { useFrame, useThree, ThreeElements } from '@react-three/fiber';
 import { inputState } from './InputState';
 
 const CHUNKS_PER_SIDE = 4; // Reduzido de 5 para 4 (16 chunks)
@@ -183,10 +184,11 @@ const Ground: React.FC = () => {
     });
   }, []);
 
-  useFrame(() => {
+  useFrame((state) => {
     if (groundMat) {
       groundMat.uniforms.uPlayerPos.value.set(inputState.characterData.x, 0, inputState.characterData.z);
-      groundMat.uniforms.uCameraPos.value.copy(inputState.characterData.x, 0, inputState.characterData.z);
+      // Fix: Use .copy with Vector3 from state.camera.position or .set with coordinates
+      groundMat.uniforms.uCameraPos.value.copy(state.camera.position);
     }
   });
 

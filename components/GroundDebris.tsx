@@ -1,5 +1,7 @@
 
 import React, { useMemo, useRef, useEffect } from 'react';
+// Fix: Added ThreeElements import to resolve JSX intrinsic element errors
+import { ThreeElements } from '@react-three/fiber';
 import * as THREE from 'three';
 
 const TWIG_COUNT = 500; // Reduzido de 2000

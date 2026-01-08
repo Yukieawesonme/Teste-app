@@ -1,7 +1,8 @@
 
 import React, { useMemo, useRef, useEffect } from 'react';
 import * as THREE from 'three';
-import { useFrame, useThree } from '@react-three/fiber';
+// Fix: Added ThreeElements to resolve JSX intrinsic element errors
+import { useFrame, useThree, ThreeElements } from '@react-three/fiber';
 import { inputState } from './InputState';
 
 const TREE_COUNT = 150; // Reduzido de 300 para 150

@@ -2,14 +2,12 @@
 {
   "name": "Verde: 3D Nature Explorer",
   "short_name": "Verde",
-  "description": "Um simulador de natureza imersivo em 3D com inteligência artificial.",
+  "description": "Simulador de natureza 3D imersivo.",
   "start_url": "./index.html",
   "display": "standalone",
-  "display_override": ["window-controls-overlay", "standalone"],
   "orientation": "landscape",
   "background_color": "#0a150a",
   "theme_color": "#16a34a",
-  "categories": ["games", "nature"],
   "icons": [
     {
       "src": "https://img.icons8.com/fluency/192/forest.png",
