@@ -1,13 +1,15 @@
 
 {
-  "name": "Verde: 3D Nature Explorer",
-  "short_name": "Verde",
-  "description": "Simulador de natureza 3D imersivo.",
+  "name": "VERDE: Nature Engine 3D",
+  "short_name": "VERDE",
+  "description": "Exploração imersiva de bioma natural em 3D",
   "start_url": "./index.html",
-  "display": "standalone",
+  "display": "fullscreen",
+  "display_override": ["window-controls-overlay", "minimal-ui"],
   "orientation": "landscape",
   "background_color": "#0a150a",
   "theme_color": "#16a34a",
+  "categories": ["games", "education"],
   "icons": [
     {
       "src": "https://img.icons8.com/fluency/192/forest.png",

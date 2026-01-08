@@ -1,14 +1,11 @@
-
 import React, { useMemo, useRef, useEffect } from 'react';
 import * as THREE from 'three';
-// Fix: Added ThreeElements to resolve JSX intrinsic element errors
-import { useFrame, useThree, ThreeElements } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { inputState } from './InputState';
 
-const TREE_COUNT = 150; // Reduzido de 300 para 150
-const BRANCHES_PER_TREE = 6; // Reduzido de 12 para 6
+const TREE_COUNT = 250; 
+const BRANCHES_PER_TREE = 6; 
 const ROOTS_PER_TREE = 2;
-const MAX_HEIGHT_LIMIT = 20;
 
 export default function Trees() {
   const trunkRef = useRef<THREE.InstancedMesh>(null);
@@ -51,10 +48,10 @@ export default function Trees() {
         varying float vDist;
         varying vec3 vWorldPos;
         void main() {
-          if (vDist > 800.0) discard;
+          if (vDist > 1200.0) discard;
           vec3 color = mix(uWoodDark, uWoodLight, 0.5);
-          float distFog = smoothstep(50.0, 400.0, vDist);
-          color = mix(color, uFogColor, distFog * 0.75);
+          float distFog = smoothstep(150.0, 1000.0, vDist);
+          color = mix(color, uFogColor, distFog * 0.85);
           gl_FragColor = vec4(color, 1.0);
         }
       `
@@ -83,10 +80,10 @@ export default function Trees() {
         varying float vDist;
         uniform vec3 uFogColor;
         void main() {
-          if (vDist > 700.0) discard;
+          if (vDist > 1200.0) discard;
           vec3 color = mix(vec3(0.05, 0.2, 0.05), vec3(0.2, 0.4, 0.15), 0.5);
-          float distFog = smoothstep(60.0, 400.0, vDist);
-          color = mix(color, uFogColor, distFog * 0.6);
+          float distFog = smoothstep(150.0, 1000.0, vDist);
+          color = mix(color, uFogColor, distFog * 0.8);
           gl_FragColor = vec4(color, 1.0);
         }
       `
@@ -94,13 +91,13 @@ export default function Trees() {
 
     const transforms = [];
     const collisionSolids = [];
-    const radiusMax = 580;
+    const radiusMax = 980; 
     for (let i = 0; i < TREE_COUNT; i++) {
       const radius = 10 + Math.sqrt(Math.random()) * radiusMax;
       const angle = Math.random() * Math.PI * 2;
       const x = Math.cos(angle) * radius;
       const z = Math.sin(angle) * radius;
-      const scale = 1.6 + Math.random() * 2.0;
+      const scale = 1.6 + Math.random() * 2.5;
       transforms.push({ x, z, scale, rot: Math.random() * Math.PI, gnarl: Math.random() });
       collisionSolids.push({ x, z, r: 1.0 * scale });
     }
@@ -144,19 +141,22 @@ export default function Trees() {
         branchDummy.updateMatrix();
         branchRef.current!.setMatrixAt(branchIdx++, branchDummy.matrix);
         
-        if (b > 2) {
+        if (b > 1) {
           const lR = 3.0 * len;
           leafDummy.position.set(tree.x + Math.sin(bAngle)*lR, h + 1.0, tree.z + Math.cos(bAngle)*lR);
-          leafDummy.scale.setScalar((1.2 + Math.random()) * tree.scale);
+          leafDummy.scale.setScalar((1.5 + Math.random()) * tree.scale);
           leafDummy.updateMatrix();
           leafRef.current!.setMatrixAt(leafIdx++, leafDummy.matrix);
         }
       }
     });
+
     trunkRef.current.instanceMatrix.needsUpdate = true;
     branchRef.current.instanceMatrix.needsUpdate = true;
     leafRef.current.instanceMatrix.needsUpdate = true;
     rootRef.current.instanceMatrix.needsUpdate = true;
+
+    [trunkRef, branchRef, leafRef, rootRef].forEach(ref => ref.current?.computeBoundingSphere());
   }, [treeTransforms]);
 
   useFrame((state) => {
@@ -169,10 +169,10 @@ export default function Trees() {
 
   return (
     <group>
-      <instancedMesh ref={trunkRef} args={[trunkGeo, trunkMat, TREE_COUNT]} castShadow receiveShadow />
-      <instancedMesh ref={rootRef} args={[rootGeo, trunkMat, TREE_COUNT * ROOTS_PER_TREE]} receiveShadow />
-      <instancedMesh ref={branchRef} args={[branchGeo, trunkMat, TREE_COUNT * BRANCHES_PER_TREE]} castShadow />
-      <instancedMesh ref={leafRef} args={[leafGeo, leafMat, TREE_COUNT * BRANCHES_PER_TREE]} castShadow />
+      <instancedMesh ref={trunkRef} args={[trunkGeo, trunkMat, TREE_COUNT]} castShadow receiveShadow frustumCulled={false} />
+      <instancedMesh ref={rootRef} args={[rootGeo, trunkMat, TREE_COUNT * ROOTS_PER_TREE]} receiveShadow frustumCulled={false} />
+      <instancedMesh ref={branchRef} args={[branchGeo, trunkMat, TREE_COUNT * BRANCHES_PER_TREE]} castShadow frustumCulled={false} />
+      <instancedMesh ref={leafRef} args={[leafGeo, leafMat, TREE_COUNT * BRANCHES_PER_TREE]} castShadow frustumCulled={false} />
     </group>
   );
 }

@@ -1,7 +1,4 @@
-
 import React, { useMemo } from 'react';
-// Fix: Added ThreeElements import to resolve JSX intrinsic element errors
-import { ThreeElements } from '@react-three/fiber';
 import { TreeData } from '../types';
 import * as THREE from 'three';
 

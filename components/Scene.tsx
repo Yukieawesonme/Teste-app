@@ -1,7 +1,4 @@
-
 import React from 'react';
-// Fix: Added ThreeElements import to resolve JSX intrinsic element errors
-import { ThreeElements } from '@react-three/fiber';
 import Trees from './Trees';
 import Bushes from './Bushes';
 import Character from './Character';

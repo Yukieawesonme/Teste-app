@@ -1,7 +1,5 @@
-
 import React, { useRef } from 'react';
-// Fix: Added ThreeElements to resolve JSX intrinsic element errors
-import { useFrame, ThreeElements } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { CloudData } from '../types';
 

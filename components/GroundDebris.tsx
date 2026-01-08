@@ -1,14 +1,11 @@
-
 import React, { useMemo, useRef, useEffect } from 'react';
-// Fix: Added ThreeElements import to resolve JSX intrinsic element errors
-import { ThreeElements } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const TWIG_COUNT = 500; // Reduzido de 2000
-const DIRT_MOUND_COUNT = 300; // Reduzido de 1000
-const LEAF_DEBRIS_COUNT = 400; // Reduzido de 1200
-const FALLEN_LOG_COUNT = 40; // Reduzido de 150
-const DEBRIS_RADIUS = 580;
+const TWIG_COUNT = 400; 
+const DIRT_MOUND_COUNT = 300; 
+const LEAF_DEBRIS_COUNT = 400; 
+const FALLEN_LOG_COUNT = 50; 
+const DEBRIS_RADIUS = 980;
 
 const GroundDebris: React.FC = () => {
   const twigRef = useRef<THREE.InstancedMesh>(null);
@@ -71,18 +68,20 @@ const GroundDebris: React.FC = () => {
       logRef.current.setMatrixAt(i, dummy.matrix);
     }
 
-    twigRef.current.instanceMatrix.needsUpdate = true;
-    moundRef.current.instanceMatrix.needsUpdate = true;
-    leafRef.current.instanceMatrix.needsUpdate = true;
-    logRef.current.instanceMatrix.needsUpdate = true;
+    [twigRef, moundRef, leafRef, logRef].forEach(ref => {
+      if (ref.current) {
+        ref.current.instanceMatrix.needsUpdate = true;
+        ref.current.computeBoundingSphere();
+      }
+    });
   }, []);
 
   return (
     <group>
-      <instancedMesh ref={twigRef} args={[twigGeo, twigMat, TWIG_COUNT]} frustumCulled={true} />
-      <instancedMesh ref={moundRef} args={[moundGeo, moundMat, DIRT_MOUND_COUNT]} frustumCulled={true} />
-      <instancedMesh ref={leafRef} args={[leafGeo, leafMat, LEAF_DEBRIS_COUNT]} frustumCulled={true} />
-      <instancedMesh ref={logRef} args={[logGeo, logMat, FALLEN_LOG_COUNT]} castShadow frustumCulled={true} />
+      <instancedMesh ref={twigRef} args={[twigGeo, twigMat, TWIG_COUNT]} frustumCulled={false} />
+      <instancedMesh ref={moundRef} args={[moundGeo, moundMat, DIRT_MOUND_COUNT]} frustumCulled={false} />
+      <instancedMesh ref={leafRef} args={[leafGeo, leafMat, LEAF_DEBRIS_COUNT]} frustumCulled={false} />
+      <instancedMesh ref={logRef} args={[logGeo, logMat, FALLEN_LOG_COUNT]} castShadow frustumCulled={false} />
     </group>
   );
 };

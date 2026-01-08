@@ -1,8 +1,6 @@
-
 import React, { useMemo, useRef } from 'react';
 import * as THREE from 'three';
-// Fix: Added ThreeElements to resolve JSX intrinsic element errors
-import { useFrame, ThreeElements } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 
 const CLOUD_COUNT = 20;
 

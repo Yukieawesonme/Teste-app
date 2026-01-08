@@ -1,7 +1,8 @@
-
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+// Import to trigger global JSX type augmentation for Three.js elements
+import '@react-three/fiber';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {

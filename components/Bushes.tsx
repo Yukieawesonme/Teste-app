@@ -1,18 +1,15 @@
-
 import React, { useMemo, useRef, useEffect } from 'react';
 import * as THREE from 'three';
-// Fix: Added ThreeElements to resolve JSX intrinsic element errors
-import { useFrame, useThree, ThreeElements } from '@react-three/fiber';
-import { inputState } from './InputState';
+import { useFrame, useThree } from '@react-three/fiber';
 
-const BUSH_COUNT = 400; // Reduzido de 1000 para 400
-const WORLD_RADIUS = 600;
+const BUSH_COUNT = 600; 
+const WORLD_RADIUS = 1000;
 
 const Bushes: React.FC = () => {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const { camera } = useThree();
 
-  const { geometry, material, rootMaterial } = useMemo(() => {
+  const { geometry, material } = useMemo(() => {
     const geo = new THREE.IcosahedronGeometry(0.8, 0); 
     const mat = new THREE.ShaderMaterial({
       uniforms: { 
@@ -29,7 +26,7 @@ const Bushes: React.FC = () => {
         void main() {
           vec4 worldPos = instanceMatrix * vec4(position, 1.0);
           vDist = distance(worldPos.xyz, uCameraPos);
-          float scale = 1.0 - smoothstep(400.0, 600.0, vDist);
+          float scale = 1.0 - smoothstep(600.0, 1000.0, vDist);
           vec3 pos = position * scale;
           gl_Position = projectionMatrix * viewMatrix * instanceMatrix * vec4(pos, 1.0);
         }
@@ -40,16 +37,15 @@ const Bushes: React.FC = () => {
         uniform vec3 uFogColor;
         varying float vDist;
         void main() {
-          if (vDist > 605.0) discard;
+          if (vDist > 1005.0) discard;
           vec3 color = mix(uColorA, uColorB, 0.5);
-          float distFog = smoothstep(50.0, 300.0, vDist);
+          float distFog = smoothstep(100.0, 800.0, vDist);
           color = mix(color, uFogColor, distFog * 0.7);
           gl_FragColor = vec4(color, 1.0);
         }
       `
     });
-    const rMat = new THREE.MeshStandardMaterial({ color: "#221a11", roughness: 1 });
-    return { geometry: geo, material: mat, rootMaterial: rMat };
+    return { geometry: geo, material: mat };
   }, []);
 
   useEffect(() => {
@@ -57,10 +53,10 @@ const Bushes: React.FC = () => {
     const dummy = new THREE.Object3D();
     for (let i = 0; i < BUSH_COUNT; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const r = 3 + Math.sqrt(Math.random()) * WORLD_RADIUS;
+      const r = 5 + Math.sqrt(Math.random()) * WORLD_RADIUS;
       const x = Math.cos(angle) * r;
       const z = Math.sin(angle) * r;
-      const scale = 0.7 + Math.random() * 1.2;
+      const scale = 0.7 + Math.random() * 1.5;
       dummy.position.set(x, 0.1, z);
       dummy.scale.setScalar(scale);
       dummy.rotation.set(Math.random(), Math.random(), Math.random());
@@ -68,6 +64,7 @@ const Bushes: React.FC = () => {
       meshRef.current.setMatrixAt(i, dummy.matrix);
     }
     meshRef.current.instanceMatrix.needsUpdate = true;
+    meshRef.current.computeBoundingSphere();
   }, []);
 
   useFrame((state) => {
@@ -78,7 +75,7 @@ const Bushes: React.FC = () => {
   });
 
   return (
-    <instancedMesh ref={meshRef} args={[geometry, material, BUSH_COUNT]} frustumCulled={true} />
+    <instancedMesh ref={meshRef} args={[geometry, material, BUSH_COUNT]} frustumCulled={false} />
   );
 };
 

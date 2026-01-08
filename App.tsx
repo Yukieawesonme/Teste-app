@@ -1,5 +1,5 @@
 
-import React, { useState, Suspense, useEffect } from 'react';
+import React, { useState, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Environment, PerspectiveCamera } from '@react-three/drei';
 
@@ -7,45 +7,11 @@ import Scene from './components/Scene';
 import UIOverlay from './components/UIOverlay';
 import EnvironmentController from './components/EnvironmentController';
 import MobileControls from './components/MobileControls';
-import { inputState } from './components/InputState';
-import { generateWorldDescription } from './services/geminiService';
 
 const App: React.FC = () => {
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isInverted, setIsInverted] = useState(false);
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [narrative, setNarrative] = useState("");
-  const [isLoadingNarrative, setIsLoadingNarrative] = useState(false);
-  
-  useEffect(() => {
-    // Captura o evento de instalação do Android para o botão "Baixar como APK"
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-    });
-  }, []);
-
-  const handleTriggerNarrative = async () => {
-    if (isLoadingNarrative) return;
-    setIsLoadingNarrative(true);
-    const context = `X:${inputState.characterData.x.toFixed(0)}, Z:${inputState.characterData.z.toFixed(0)}. Mata verde.`;
-    const desc = await generateWorldDescription(context);
-    setNarrative(desc);
-    setIsLoadingNarrative(false);
-    setTimeout(() => setNarrative(""), 8000);
-  };
-
-  const handleInstall = async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      console.log(`User response to install: ${outcome}`);
-      setDeferredPrompt(null);
-    } else {
-      alert("Para instalar no Android:\n1. Use o Google Chrome\n2. Clique nos 3 pontinhos\n3. Selecione 'Instalar Aplicativo'");
-    }
-  };
 
   return (
     <div className="w-full h-screen relative bg-[#0a150a] overflow-hidden touch-none">
@@ -59,15 +25,9 @@ const App: React.FC = () => {
             <p className="text-zinc-500 text-[10px] mb-10 uppercase tracking-[0.3em] font-bold">Nature Engine 3D</p>
             <button 
               onClick={() => setIsGameStarted(true)}
-              className="w-full bg-green-600 py-5 rounded-2xl text-white font-black text-xl shadow-xl active:scale-95 transition-all mb-4"
+              className="w-full bg-green-600 py-5 rounded-2xl text-white font-black text-xl shadow-xl active:scale-95 transition-all"
             >
               INICIAR EXPLORAÇÃO
-            </button>
-            <button 
-              onClick={handleInstall}
-              className="text-green-500 text-[10px] font-black tracking-widest uppercase opacity-60 hover:opacity-100"
-            >
-              Instalar no Android
             </button>
           </div>
         </div>
@@ -87,10 +47,6 @@ const App: React.FC = () => {
             togglePause={() => setIsPaused(!isPaused)} 
             isInverted={isInverted} 
             toggleInvert={() => setIsInverted(!isInverted)}
-            onInstall={handleInstall}
-            narrative={narrative}
-            isLoadingNarrative={isLoadingNarrative}
-            onTriggerNarrative={handleTriggerNarrative}
           />
         </>
       )}

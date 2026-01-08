@@ -7,15 +7,10 @@ interface UIOverlayProps {
   togglePause: () => void;
   isInverted: boolean;
   toggleInvert: () => void;
-  onInstall: () => void;
-  narrative: string;
-  isLoadingNarrative: boolean;
-  onTriggerNarrative: () => void;
 }
 
 const UIOverlay: React.FC<UIOverlayProps> = ({ 
-  isPaused, togglePause, isInverted, toggleInvert, onInstall, 
-  narrative, isLoadingNarrative, onTriggerNarrative 
+  isPaused, togglePause, isInverted, toggleInvert 
 }) => {
   const [atBoundary, setAtBoundary] = useState(false);
   const [pos, setPos] = useState({ x: 0, z: 0 });
@@ -40,15 +35,6 @@ const UIOverlay: React.FC<UIOverlayProps> = ({
         />
       </div>
 
-      {/* Narrativa Gemini */}
-      {narrative && (
-        <div className="absolute bottom-40 left-1/2 -translate-x-1/2 max-w-lg w-[90%] bg-black/40 backdrop-blur-lg p-6 rounded-2xl border border-green-500/20 text-center animate-in fade-in slide-in-from-bottom-4 duration-1000">
-          <p className="text-green-300 text-sm font-medium italic leading-relaxed">
-            "{narrative}"
-          </p>
-        </div>
-      )}
-
       {atBoundary && (
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 bg-red-600 text-white px-6 py-2 rounded-full font-bold shadow-xl animate-bounce">
           LIMITE DA MATA
@@ -57,13 +43,6 @@ const UIOverlay: React.FC<UIOverlayProps> = ({
 
       {/* Botões Superiores */}
       <div className="absolute top-4 right-4 pointer-events-auto flex gap-2">
-        <button 
-          onClick={onTriggerNarrative} 
-          disabled={isLoadingNarrative}
-          className={`px-4 py-2 rounded-full text-[10px] font-black tracking-widest transition-all ${isLoadingNarrative ? 'bg-zinc-800 text-zinc-500' : 'bg-green-600/40 text-green-400 border border-green-500/30 hover:bg-green-600 hover:text-white'}`}
-        >
-          {isLoadingNarrative ? "ESCUTANDO..." : "SENTIR A NATUREZA"}
-        </button>
         <button onClick={togglePause} className="p-3 bg-black/40 rounded-full text-white border border-white/10 text-[10px] font-bold">
           {isPaused ? "JOGAR" : "PAUSE"}
         </button>
@@ -80,11 +59,7 @@ const UIOverlay: React.FC<UIOverlayProps> = ({
               {isInverted ? "CONTROLES: INVERTIDOS" : "CONTROLES: NORMAL"}
             </button>
 
-            <button onClick={onInstall} className="w-full bg-blue-600/20 text-blue-400 py-4 rounded-xl mb-3 font-bold active:scale-95 transition-transform border border-blue-500/30">
-              BAIXAR COMO APK
-            </button>
-
-            <p className="text-zinc-600 text-[10px] uppercase font-bold tracking-widest mt-6">VERDE v1.0.8 • IA NARRATIVE ENABLED</p>
+            <p className="text-zinc-600 text-[10px] uppercase font-bold tracking-widest mt-6">VERDE v1.0.9 • EXPLORAÇÃO 3D</p>
           </div>
         </div>
       )}

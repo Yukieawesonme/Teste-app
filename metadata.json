@@ -1,5 +1,5 @@
 {
-  "name": "Copy of TESTE APK JOGO 1",
-  "description": "An immersive 3D environment featuring a lush green biome with scattered trees, rolling hills, and a tranquil atmosphere. Powered by Three.js and Gemini for dynamic world description.",
+  "name": "VERDE APK ENGINE",
+  "description": "Engine 3D otimizada para dispositivos Android via arquitetura PWA/APK. Ambiente de bioma verde com renderização instanciada e alta performance.",
   "requestFramePermissions": []
 }

@@ -1,18 +1,15 @@
-
 import React, { useRef, useMemo, useEffect } from 'react';
 import * as THREE from 'three';
-// Fix: Added ThreeElements to resolve JSX intrinsic element errors
-import { useFrame, useThree, ThreeElements } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { inputState } from './InputState';
 
-const CHUNKS_PER_SIDE = 4; // Reduzido de 5 para 4 (16 chunks)
-const CHUNK_SIZE = 120; 
-const GRASS_PER_CHUNK = 1200; // Reduzido de 2500 para 1200
-const WORLD_RADIUS = 600; 
+const CHUNKS_PER_SIDE = 6; 
+const CHUNK_SIZE = 180; 
+const GRASS_PER_CHUNK = 800; 
+const WORLD_RADIUS = 1000; 
 
-// Material e Geometria compartilhados para evitar excesso de compilação de shaders
-const sharedGrassGeo = new THREE.PlaneGeometry(0.12, 0.22, 1, 2);
-sharedGrassGeo.translate(0, 0.11, 0);
+const sharedGrassGeo = new THREE.PlaneGeometry(0.12, 0.25, 1, 2);
+sharedGrassGeo.translate(0, 0.125, 0);
 
 const sharedGrassMat = new THREE.ShaderMaterial({
   uniforms: {
@@ -41,10 +38,10 @@ const sharedGrassMat = new THREE.ShaderMaterial({
       vec4 worldBasePos = instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0);
       vDistToCamera = distance(worldBasePos.xyz, uCameraPos);
       
-      // Descarte baseado em distância otimizado
-      vFade = 1.0 - smoothstep(120.0, 180.0, vDistToCamera);
+      // Aumentado o range de fade: começa a sumir aos 250 e some total aos 400
+      vFade = 1.0 - smoothstep(250.0, 400.0, vDistToCamera);
       
-      if (vFade < 0.01) {
+      if (vFade < 0.001) {
         gl_Position = vec4(0.0, 0.0, 0.0, 1.0);
         return;
       }
@@ -53,15 +50,15 @@ const sharedGrassMat = new THREE.ShaderMaterial({
       vNoise = rnd;
 
       float windTime = uTime * (0.8 + rnd * 0.4);
-      float wind = sin(windTime + worldBasePos.x * 1.5 + worldBasePos.z * 1.5) * 0.06;
+      float wind = sin(windTime + worldBasePos.x * 1.5 + worldBasePos.z * 1.5) * 0.08;
       
       vec3 dirToPlayer = worldBasePos.xyz - uPlayerPos;
       float distToPlayer = length(dirToPlayer.xz);
-      float pushForce = smoothstep(2.0, 0.0, distToPlayer);
-      vec2 pushDir = normalize(dirToPlayer.xz + 0.001) * pushForce * 1.0;
+      float pushForce = smoothstep(2.5, 0.0, distToPlayer);
+      vec2 pushDir = normalize(dirToPlayer.xz + 0.001) * pushForce * 1.2;
       
       vec3 pos = position;
-      float heightVar = 0.8 + rnd * 0.4;
+      float heightVar = 0.8 + rnd * 0.5;
       pos.y *= heightVar;
 
       float bendFactor = pow(uv.y, 1.5);
@@ -84,7 +81,7 @@ const sharedGrassMat = new THREE.ShaderMaterial({
     uniform vec3 uFogColor;
 
     void main() {
-      if (vFade < 0.05) discard;
+      if (vFade < 0.01) discard;
       
       vec3 topColor = mix(uColorLush, uColorDry, vNoise * 0.4);
       float grad = pow(vElevation, 0.7);
@@ -92,7 +89,7 @@ const sharedGrassMat = new THREE.ShaderMaterial({
       
       color *= (0.9 + vNoise * 0.2);
 
-      float distFog = smoothstep(30.0, 160.0, vDistToCamera);
+      float distFog = smoothstep(100.0, 380.0, vDistToCamera);
       color = mix(color, uFogColor, distFog * 0.8);
       
       gl_FragColor = vec4(color, vFade);
@@ -100,7 +97,7 @@ const sharedGrassMat = new THREE.ShaderMaterial({
   `,
   transparent: true,
   side: THREE.DoubleSide,
-  depthWrite: false // Melhor performance em shaders de transparência (folhagens)
+  depthWrite: false
 });
 
 const GrassChunk: React.FC<{ position: [number, number, number] }> = ({ position }) => {
@@ -114,7 +111,7 @@ const GrassChunk: React.FC<{ position: [number, number, number] }> = ({ position
       const x = (Math.random() - 0.5) * CHUNK_SIZE + position[0];
       const z = (Math.random() - 0.5) * CHUNK_SIZE + position[2];
       if (x*x + z*z > WORLD_RADIUS * WORLD_RADIUS) {
-        dummy.position.set(0, -10, 0); 
+        dummy.position.set(0, -50, 0); 
         dummy.scale.setScalar(0);
       } else {
         dummy.position.set(x, 0, z);
@@ -125,6 +122,8 @@ const GrassChunk: React.FC<{ position: [number, number, number] }> = ({ position
       meshRef.current.setMatrixAt(i, dummy.matrix);
     }
     meshRef.current.instanceMatrix.needsUpdate = true;
+    // Força o cálculo do bounding box para garantir que não suma da câmera
+    meshRef.current.computeBoundingSphere();
   }, [position]);
 
   useFrame((state) => {
@@ -135,7 +134,7 @@ const GrassChunk: React.FC<{ position: [number, number, number] }> = ({ position
     }
   });
 
-  return <instancedMesh ref={meshRef} args={[sharedGrassGeo, sharedGrassMat, GRASS_PER_CHUNK]} frustumCulled={true} />;
+  return <instancedMesh ref={meshRef} args={[sharedGrassGeo, sharedGrassMat, GRASS_PER_CHUNK]} frustumCulled={false} />;
 };
 
 const Ground: React.FC = () => {
@@ -175,9 +174,9 @@ const Ground: React.FC = () => {
           
           float distToPlayer = distance(vWorldPos.xz, uPlayerPos.xz);
           float distToCam = distance(vWorldPos.xyz, uCameraPos);
-          float distFog = smoothstep(80.0, 250.0, distToCam);
+          float distFog = smoothstep(150.0, 600.0, distToCam);
           
-          baseColor = mix(baseColor, uFogColor, distFog * 0.6);
+          baseColor = mix(baseColor, uFogColor, distFog * 0.7);
           gl_FragColor = vec4(baseColor, 1.0);
         }
       `
@@ -187,7 +186,6 @@ const Ground: React.FC = () => {
   useFrame((state) => {
     if (groundMat) {
       groundMat.uniforms.uPlayerPos.value.set(inputState.characterData.x, 0, inputState.characterData.z);
-      // Fix: Use .copy with Vector3 from state.camera.position or .set with coordinates
       groundMat.uniforms.uCameraPos.value.copy(state.camera.position);
     }
   });
@@ -206,7 +204,7 @@ const Ground: React.FC = () => {
   return (
     <group>
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow material={groundMat}>
-        <circleGeometry args={[WORLD_RADIUS + 100, 32]} />
+        <circleGeometry args={[WORLD_RADIUS + 200, 64]} />
       </mesh>
       {chunks.map((pos, i) => <GrassChunk key={i} position={pos as [number, number, number]} />)}
     </group>

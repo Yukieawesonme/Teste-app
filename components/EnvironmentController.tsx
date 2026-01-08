@@ -1,7 +1,5 @@
-
 import React, { useRef, useMemo } from 'react';
-// Fix: Added ThreeElements to resolve JSX intrinsic element errors
-import { useFrame, useThree, ThreeElements } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { Sky, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -70,7 +68,7 @@ export default function EnvironmentController() {
         position={[100, 150, 100]} 
         intensity={1.0} 
         castShadow 
-        shadow-mapSize={[512, 512]} // Reduzido drasticamente para 512 para estabilidade total
+        shadow-mapSize={[512, 512]} 
         shadow-camera-left={-80}
         shadow-camera-right={80}
         shadow-camera-top={80}
