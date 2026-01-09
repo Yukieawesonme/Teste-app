@@ -1,5 +1,7 @@
 {
-  "name": "VERDE APK ENGINE",
-  "description": "Engine 3D otimizada para dispositivos Android via arquitetura PWA/APK. Ambiente de bioma verde com renderização instanciada e alta performance.",
-  "requestFramePermissions": []
+  "name": "VERDE ENGINE APK RELEASE",
+  "description": "Build de produção assinada para Android. Arquitetura APK/PWA com Digital Asset Links e suporte offline completo.",
+  "requestFramePermissions": [
+    "camera"
+  ]
 }

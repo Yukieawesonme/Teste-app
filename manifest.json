@@ -2,14 +2,22 @@
 {
   "name": "VERDE: Nature Engine 3D",
   "short_name": "VERDE",
-  "description": "Exploração imersiva de bioma natural em 3D",
-  "start_url": "./index.html",
+  "description": "Exploração imersiva de bioma natural em 3D otimizada para Android",
+  "start_url": "./index.html?utm_source=apk",
   "display": "fullscreen",
-  "display_override": ["window-controls-overlay", "minimal-ui"],
+  "display_override": ["window-controls-overlay"],
   "orientation": "landscape",
   "background_color": "#0a150a",
   "theme_color": "#16a34a",
-  "categories": ["games", "education"],
+  "categories": ["games", "nature", "simulation"],
+  "prefer_related_applications": true,
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.verde.nature.engine",
+      "id": "com.verde.nature.engine"
+    }
+  ],
   "icons": [
     {
       "src": "https://img.icons8.com/fluency/192/forest.png",
